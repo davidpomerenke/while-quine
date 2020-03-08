@@ -1,0 +1,1 @@
+test read IgnoreInput {while cons X2 nil {}} write X1
