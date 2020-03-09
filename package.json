@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "build": "git submodule init && git submodule update && cd HWhile && stack install --local-bin-path .. hwhile && chmod +x ../hwhile",
-    "clean": "rm history.csv; echo '\"Hash\",\"Program\",\"Program AST\",\"Result AST\"' > history.csv",
+    "clean": "rm test.while; rm history.csv; echo '\"Hash\",\"Program\",\"Program AST\",\"Result AST\"' > history.csv",
     "start": "node index.mjs"
   },
   "author": "David Pomerenke",
