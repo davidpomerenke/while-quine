@@ -1,15 +1,17 @@
 {
-  "name": "aima-hwhile-quine",
-  "version": "1.0.0",
-  "description": "",
+  "name": "while-quine",
+  "version": "0.1.0",
+  "description": "Searching for the WHILE Quine.",
   "main": "index.js",
   "scripts": {
     "build": "git submodule init && git submodule update && cd HWhile && stack install --local-bin-path .. hwhile && chmod +x ../hwhile",
+    "clean": "rm history.csv; echo '\"Hash\",\"Program\",\"Program AST\",\"Result AST\"' > history.csv",
     "start": "node index.mjs"
   },
   "author": "David Pomerenke",
   "license": "ISC",
   "dependencies": {
-    "aima": "^0.6.15"
+    "aima": "^0.6.15",
+    "crypto-js": "^4.0.0"
   }
 }

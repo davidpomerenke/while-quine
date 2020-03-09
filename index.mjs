@@ -1,6 +1,15 @@
 import { SearchProblem, breadthFirstSearch } from 'aima'
+import sha3 from 'crypto-js/sha3.js'
 import fs from 'fs'
 import childProcess from 'child_process'
+
+const config = {
+  timeout: 5, // seconds to wait for program termination
+  verbose: true // log program codes
+}
+
+const hashHistory = fs.readFileSync('history.csv', { encoding: 'utf-8' }).match(/(?<=\n")(\d|[a-z])+/g) || []
+let i = 0
 
 export const whileQuineProblem = new SearchProblem({
   initialState: 'test read IgnoreInput <BLOCK> write X1',
@@ -35,13 +44,20 @@ export const whileQuineProblem = new SearchProblem({
   result: (state, action) => state.replace(nonterminal, action),
   goalTest: state => {
     if (!state.match(nonterminal)) {
-      fs.writeFileSync('test.while', state)
-      console.log(state)
-      const programAST = childProcess.execSync('./hwhile -u test.while', { encoding: 'utf-8' })
-      const resultAST = childProcess.execSync('timeout 5 ./hwhile -La test.while nil || echo -1', { encoding: 'utf-8' })
-      const normalise = a => a.replace(/\s|\n|\b/g, '')
-      console.log(normalise(resultAST))
-      return normalise(programAST) === normalise(resultAST)
+      const hash = sha3(state).toString()
+      if (hashHistory.includes(hash)) {
+        if (config.verbose) console.log('Skipping previously tested programs ... ' + i++)
+        return false
+      } else {
+        fs.writeFileSync('test.while', state)
+        if (config.verbose) console.log(state)
+        const exec = a => childProcess.execSync(a, { encoding: 'utf-8' }).replace(/\s|\n|\b/g, '')
+        const programAST = exec('./hwhile -u test.while')
+        const resultAST = exec(`timeout ${config.timeout} ./hwhile -La test.while nil || echo "timeout:${config.timeout}s"`)
+        hashHistory.push(hash)
+        fs.appendFileSync('history.csv', '"' + hash + '","' + state + '","' + programAST + '","' + resultAST + '"\n')
+        return programAST === resultAST
+      }
     } else {
       return false
     }
