@@ -10,6 +10,7 @@ const config = {
 
 const hashHistory = fs.readFileSync('history.csv', { encoding: 'utf-8' }).match(/(?<=\n")(\d|[a-z])+/g) || []
 let i = 0
+let j = 0
 
 export const whileQuineProblem = new SearchProblem({
   initialState: 'test read IgnoreInput <BLOCK> write X1',
@@ -43,10 +44,12 @@ export const whileQuineProblem = new SearchProblem({
     : [],
   result: (state, action) => state.replace(nonterminal, action),
   goalTest: state => {
+    if (config.verbose) console.log(j + ' programs, ' + i + ' states ...')
+    i++
     if (!state.match(nonterminal)) {
+      j++
       const hash = sha3(state).toString()
       if (hashHistory.includes(hash)) {
-        if (config.verbose) console.log('Skipping previously tested programs ... ' + i++)
         return false
       } else {
         fs.writeFileSync('test.while', state)
