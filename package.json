@@ -5,13 +5,15 @@
   "main": "index.js",
   "scripts": {
     "build": "git submodule init && git submodule update && cd HWhile && stack install --local-bin-path .. hwhile && chmod +x ../hwhile",
-    "clean": "rm test.while; rm history.csv; echo '\"Hash\",\"Program\",\"Program AST\",\"Result AST\"' > history.csv",
+    "clean": "rm *test.while; rm *history.csv",
     "start": "node index.mjs"
   },
   "author": "David Pomerenke",
   "license": "ISC",
   "dependencies": {
     "aima": "^0.6.15",
-    "crypto-js": "^4.0.0"
+    "crypto-js": "^4.0.0",
+    "csv-parse": "^4.8.8",
+    "fast-levenshtein": "^2.0.6"
   }
 }

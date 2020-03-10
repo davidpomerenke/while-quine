@@ -1,74 +1,86 @@
-import { SearchProblem, breadthFirstSearch } from 'aima'
+import { SearchProblem, breadthFirstSearch, uniformCostSearch, aStarSearch } from 'aima'
+import editDistance from 'fast-levenshtein'
 import sha3 from 'crypto-js/sha3.js'
+import parseCSV from 'csv-parse/lib/sync.js'
 import fs from 'fs'
 import childProcess from 'child_process'
 
-const config = {
-  timeout: 5, // seconds to wait for program termination
-  verbose: true // log program codes
-}
-
-const hashHistory = fs.readFileSync('history.csv', { encoding: 'utf-8' }).match(/(?<=\n")(\d|[a-z])+/g) || []
-let i = 0
-let j = 0
-
-export const whileQuineProblem = new SearchProblem({
-  initialState: 'test read IgnoreInput <BLOCK> write X1',
-  actions: state => state.match(nonterminal)
-    ? {
-      '<EXPRESSION>': [
-        'nil',
-        'cons <EXPRESSION> <EXPRESSION>',
-        'hd <EXPRESSION>',
-        'tl <EXPRESSION>',
-        '<VARIABLE>'
-      ],
-      '<BLOCK>': [
-        '{}',
-        '{<STATEMENT-LIST>}'
-      ],
-      '<STATEMENT-LIST>': [
-        '<COMMAND>',
-        '<COMMAND>; <STATEMENT-LIST>'
-      ],
-      '<COMMAND>': [
-        '<VARIABLE> := <EXPRESSION>',
-        'if <EXPRESSION> <BLOCK> else <BLOCK>',
-        'while <EXPRESSION> <BLOCK>'
-      ],
-      '<VARIABLE>': [
-        ...variables(state),
-        'X' + (variables(state).length + 1)
-      ]
-    }[state.match(nonterminal)[0]]
-    : [],
-  result: (state, action) => state.replace(nonterminal, action),
-  goalTest: state => {
-    if (config.verbose) console.log(j + ' programs, ' + i + ' states ...')
-    i++
-    if (!state.match(nonterminal)) {
-      j++
-      const hash = sha3(state).toString()
-      if (hashHistory.includes(hash)) {
-        return false
-      } else {
-        fs.writeFileSync('test.while', state)
-        if (config.verbose) console.log(state)
-        const exec = a => childProcess.execSync(a, { encoding: 'utf-8' }).replace(/\s|\n|\b/g, '')
-        const programAST = exec('./hwhile -u test.while')
-        const resultAST = exec(`timeout ${config.timeout} ./hwhile -La test.while nil || echo "timeout:${config.timeout}s"`)
-        hashHistory.push(hash)
-        fs.appendFileSync('history.csv', '"' + hash + '","' + state + '","' + programAST + '","' + resultAST + '"\n')
-        return programAST === resultAST
-      }
+export const whileQuineProblem = (config = {}) => {
+  config = {
+    historyFileName: 'history', // .csv
+    tempFileName: 'test', // .while
+    timeout: 5, // seconds to wait for program termination
+    verbose: true, // log program codes
+    ...config
+  }
+  console.log(config)
+  const history = config.historyFileName
+    ? new Map(
+      parseCSV(fs.readFileSync(config.historyFileName + '.csv', { encoding: 'utf-8', flag: 'a+' }))
+        .map(a => [a[0], a.slice(1)]))
+    : new Map()
+  const nonterminal = /<[^>]+>/
+  const variables = state => state.match(/X\d+/g)
+  const AST = code => {
+    const hash = sha3(code).toString()
+    if (history.has(hash)) {
+      return history.get(hash)
     } else {
-      return false
+      if (config.verbose) console.log(code)
+      // compute results by calling the hwhile interpreter
+      fs.writeFileSync(config.tempFileName + '.while', code)
+      const exec = a => childProcess.execSync(a, { encoding: 'utf-8' }).replace(/\s|\n|\b/g, '')
+      const programAST = exec(`./hwhile -u ${config.tempFileName}.while`)
+      const resultAST = exec(`timeout ${config.timeout} ./hwhile -La ${config.tempFileName}.while nil || echo "timeout:${config.timeout}s"`)
+      // store results
+      const result = [programAST, resultAST]
+      history.set(hash, result)
+      fs.appendFileSync(config.historyFileName + '.csv', [hash, ...result].map(a => `"${a}"`).join(',') + '\n')
+      return result
     }
-  },
-  stepCost: (state, action) => 1
-})
-
-const nonterminal = /<[^>]+>/
-const variables = state => state.match(/X\d+/g)
-
-console.log(breadthFirstSearch(whileQuineProblem))
+  }
+  return new SearchProblem({
+    initialState: { code: config.tempFileName + ' read IgnoreInput {<BLOCK>} write X1' },
+    actions: state => state.code.match(nonterminal)
+      ? { // simplified grammar, e. g., empty blocks are omitted
+        '<EXPRESSION>': [
+          'nil',
+          'cons <EXPRESSION> <EXPRESSION>',
+          'hd <EXPRESSION>',
+          'tl <EXPRESSION>',
+          '<VARIABLE>'
+        ],
+        '<BLOCK>': [
+          '<COMMAND>',
+          '<COMMAND>; <BLOCK>'
+        ],
+        '<COMMAND>': [
+          '<VARIABLE> := <EXPRESSION>',
+          'if <EXPRESSION> {<BLOCK>}',
+          'if <EXPRESSION> {<BLOCK>} else {<BLOCK>}',
+          'while <EXPRESSION> {<BLOCK>}'
+        ],
+        '<VARIABLE>': [
+          ...variables(state.code),
+          'X' + (variables(state.code).length + 1)
+        ]
+      }[state.code.match(nonterminal)[0]]
+      : [],
+    result: (state, action) => {
+      const code = state.code.replace(nonterminal, action)
+      if (!code.match(nonterminal)) {
+        const [programAST, resultAST] = AST(code)
+        return { code: code, programAST: programAST, resultAST: resultAST }
+      } else return { code: code }
+    },
+    goalTest: state => 'programAST' in state && state.programAST === state.resultAST,
+    stepCost: (state, action) => (action.match(new RegExp(nonterminal.source, 'g')) || []).length,
+    heuristic: state => editDistance.get(
+      ...AST(
+        state.code
+          .replace(/<BLOCK>/g, '<COMMAND>')
+          .replace(/<COMMAND>/g, '<VARIABLE> := <EXPRESSION>')
+          .replace(/<VARIABLE>/g, 'X1')
+          .replace(/<EXPRESSION>/g, 'nil')))
+  })
+}
