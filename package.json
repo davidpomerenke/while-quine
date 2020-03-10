@@ -6,9 +6,10 @@
   "scripts": {
     "build": "git submodule init && git submodule update && cd HWhile && stack install --local-bin-path .. hwhile && chmod +x ../hwhile",
     "clean": "rm *test.while; rm */*_history.csv; rm */*log*",
-    "start": "node index.mjs",
+    "start": "node run.mjs",
     "compare": "node comparison/bfs.mjs & node comparison/ucs.mjs & node comparison/ass.mjs &",
-    "logcompare": "watch -t -n 10 \"wc -l comparison/bfs_history.csv >> comparison/log.txt; wc -l comparison/ucs_history.csv >> comparison/log.txt; wc -l comparison/ass_history.csv >> comparison/log.txt\""
+    "logcompare": "watch -t -n 10 \"wc -l comparison/bfs_history.csv >> comparison/log.txt; wc -l comparison/ucs_history.csv >> comparison/log.txt; wc -l comparison/ass_history.csv >> comparison/log.txt\"",
+    "plot": "node comparison/comparison.mjs"
   },
   "author": "David Pomerenke",
   "license": "ISC",
@@ -16,6 +17,7 @@
     "aima": "^0.6.15",
     "crypto-js": "^4.0.0",
     "csv-parse": "^4.8.8",
-    "fast-levenshtein": "^2.0.6"
+    "fast-levenshtein": "^2.0.6",
+    "plotly": "^1.0.6"
   }
 }
