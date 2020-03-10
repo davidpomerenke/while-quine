@@ -42,4 +42,4 @@ Also, if you have any suggestions how to improve the script, your issues and pul
 
 ## Manual approach
 
-I had also briefly started to pursue an unsuccessful [manual approach](https://github.com/davidpomerenke/while-quine/quine.md).
+I had also briefly started to pursue an unsuccessful [manual approach](https://github.com/davidpomerenke/while-quine/blob/master/quine.md).
