@@ -13,7 +13,6 @@ export const whileQuineProblem = (config = {}) => {
     verbose: true, // log program codes
     ...config
   }
-  console.log(config)
   const history = config.historyFileName
     ? new Map(
       parseCSV(fs.readFileSync(config.historyFileName + '.csv', { encoding: 'utf-8', flag: 'a+' }))

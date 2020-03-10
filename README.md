@@ -8,9 +8,11 @@ This script uses uniform-cost search on possible abstract syntax trees to find a
 
 `npm run build`: Fetch and build the WHILE binary. Requires the [Haskell Tool Stack](https://docs.haskellstack.org/en/stable/README/).
 
+`npm start`: Start the program to undertake further attempts at finding a quine. The search tree will be built anew on each start (which is unfortunately extremely slow), but all previous attempts which are saved in `history.csv` will not be executed again. The attempts will be saved to `history.csv`.
+
 `npm run clean`: Empty the table of previous attempts in `history.csv`. Usually you do not want to run this because you do not want to recompute the whole table.
 
-`npm start`: Start the program to undertake further attempts at finding a quine. The search tree will be built anew on each start (which is unfortunately extremely slow), but all previous attempts which are saved in `history.csv` will not be executed again. The attempts will be saved to `history.csv`.
+`npm run compare`: Starts three background threads running breadth-first search, uniform-cost search and A* search, respectively. You will need to kill them manually (by using your process manager or using `kill <PID>` three times), be careful. It would be cool if the background processes could be automatically killed by one single command which could then be put as a script (like `npm run stopall` or so) into `package.json`, please create an issue if you have an idea how to do that.
 
 ## Contributing
 
@@ -22,4 +24,4 @@ Also, if you have any suggestions how to improve the script, your issues and pul
 
 ## Manual approach
 
-I have also pursued an unsuccessful [manual approach](https://github.com/davidpomerenke/while-quine/quine.md).
+I had also briefly started to pursue an unsuccessful [manual approach](https://github.com/davidpomerenke/while-quine/quine.md).

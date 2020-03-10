@@ -5,8 +5,10 @@
   "main": "index.js",
   "scripts": {
     "build": "git submodule init && git submodule update && cd HWhile && stack install --local-bin-path .. hwhile && chmod +x ../hwhile",
-    "clean": "rm *test.while; rm *history.csv",
-    "start": "node index.mjs"
+    "clean": "rm *test.while; rm */*_history.csv; rm */*log*",
+    "start": "node index.mjs",
+    "compare": "node comparison/bfs.mjs & node comparison/ucs.mjs & node comparison/ass.mjs &",
+    "logcompare": "watch -t -n 10 \"wc -l comparison/bfs_history.csv >> comparison/log.txt; wc -l comparison/ucs_history.csv >> comparison/log.txt; wc -l comparison/ass_history.csv >> comparison/log.txt\""
   },
   "author": "David Pomerenke",
   "license": "ISC",
