@@ -37,7 +37,7 @@ export const whileQuineProblem = (config = {}) => {
       // store results
       const result = [programAST, outputAST]
       history.set(hash, result)
-      fs.appendFileSync(config.historyFileName + '.csv', [hash, ...result].map(a => `"${a}"`).join(',') + '\n')
+      fs.appendFileSync(config.historyFileName + '.csv', [hash, code, ...result].map(a => `"${a}"`).join(',') + '\n')
       return result
     }
   }

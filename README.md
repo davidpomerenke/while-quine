@@ -26,7 +26,7 @@ This script uses uniform-cost search on possible abstract syntax trees to find a
 
 ## Contributing
 
-It would be cool if you could clone the project, run it for a few hours or days, and submit a pull request with your results :)
+It would be cool if you could clone or install the project, run it for a few hours or days, and submit a pull request with your results :)
 
 If you actually find the Quine with this program, you can collect 2.5£ reward from me. This presupposes that you do not before me claim the original 5£ reward set out by a certain undisclosed person.
 
@@ -35,6 +35,10 @@ Also, if you have any suggestions how to improve the script, your issues and pul
 ## ToDo
 
 - Add self-interpreter (and maybe other useful functions) to grammar.
+- Testing:
+  - Check for duplicates in hash tables. (There should be none.)
+- Data analysis:
+  - List programs in order of lowest edit distance.
 
 ## Manual approach
 
