@@ -15,7 +15,7 @@
 
 *)
 
-u read PD {
+interpret read PD {
   P   := hd PD;              // P = [X,B,Y]
   D   := hd tl PD;           // D is input value)
   X   := hd P;               // X is input var name
@@ -28,7 +28,7 @@ u read PD {
   St    := [bind];           // initialise store with binding for X
   state := [ CSt, DSt, St ]; // wrap state for STEP macro
   while CSt {
-    state := <STEPn> state;  // execute the STEP macro while there is code to execute
+    state := <step> state;  // execute the STEP macro while there is code to execute
     CSt   := hd state
   };
   St  := hd tl tl state;     // get final store

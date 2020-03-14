@@ -17,7 +17,7 @@
 
 *)
 
-STEPn read state {
+step read state {
   // retrieve individual arguments from list
   CSt := hd state;
   DSt := hd tl state;

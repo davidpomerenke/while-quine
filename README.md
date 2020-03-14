@@ -2,7 +2,7 @@
 
 [![NPM Package](https://img.shields.io/npm/v/while-quine.svg)](https://www.npmjs.com/package/while-quine)
 
-This script uses uniform-cost search on possible abstract syntax trees to find a [Quine](https://en.wikipedia.org/wiki/Quine_(programming)) for the [WHILE programming language](https://github.com/alexj136/HWhile).
+This script uses uniform-cost search on possible abstract syntax trees to search for a [Quine](https://en.wikipedia.org/wiki/Quine_(programming)) for the [WHILE programming language](https://github.com/alexj136/HWhile). (It has not yet found it, though.)
 
 ## Usage
 
@@ -34,7 +34,8 @@ Also, if you have any suggestions how to improve the script, your issues and pul
 
 ## ToDo
 
-- Add self-interpreter (and maybe other useful functions) to grammar.
+- Add self-interpreter (and maybe other useful functions) to grammar:
+  - Allow for interpretation of dunamic programs (i. e., they might have no valid syntax).
 - Testing:
   - Check for duplicates in hash tables. (There should be none.)
 - Data analysis:
